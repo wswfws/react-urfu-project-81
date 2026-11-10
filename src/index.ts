@@ -1,3 +1,5 @@
+import Tag, { type TagAttributes } from './Tag.js';
+
 type FormMethod = 'get' | 'post';
 
 type Template = Record<string, unknown>;
@@ -24,11 +26,8 @@ const escapeHtml = (value: unknown): string =>
 const capitalize = (value: string): string =>
   value.charAt(0).toUpperCase() + value.slice(1);
 
-const renderAttributes = (attributes: Record<string, unknown>): string =>
-  Object.entries(attributes)
-    .filter(([, value]) => value !== undefined && value !== null && value !== false)
-    .map(([name, value]) => (value === true ? ` ${name}` : ` ${name}="${escapeHtml(value)}"`))
-    .join('');
+const asAttributes = (attributes: Record<string, unknown>): TagAttributes =>
+  attributes as TagAttributes;
 
 export class FormBuilder {
   private readonly parts: string[] = [];
@@ -39,23 +38,32 @@ export class FormBuilder {
     const { as = 'input', ...attributes } = options;
     const value = this.template[name];
 
-    this.parts.push(`<label for="${escapeHtml(name)}">${escapeHtml(capitalize(name))}</label>`);
+    this.parts.push(
+      new Tag('label', { for: name }, escapeHtml(capitalize(name))).toString(),
+    );
 
     if (as === 'textarea') {
       this.parts.push(
-        `<textarea${renderAttributes({ cols: 20, rows: 40, ...attributes, name })}>${escapeHtml(value ?? '')}</textarea>`,
+        new Tag(
+          'textarea',
+          asAttributes({ cols: 20, rows: 40, ...attributes, name }),
+          escapeHtml(value ?? ''),
+        ).toString(),
       );
       return this;
     }
 
     this.parts.push(
-      `<input${renderAttributes({ name, type: 'text', ...attributes, value: value ?? '' })}>`,
+      new Tag(
+        'input',
+        asAttributes({ name, type: 'text', ...attributes, value: value ?? '' }),
+      ).toString(),
     );
     return this;
   }
 
   submit(value = 'Save'): this {
-    this.parts.push(`<input${renderAttributes({ type: 'submit', value })}>`);
+    this.parts.push(new Tag('input', { type: 'submit', value }).toString());
     return this;
   }
 
@@ -75,8 +83,9 @@ export default class HexletCode {
 
     callback(builder);
 
-    return `<form${renderAttributes({ action, method, ...attributes })}>${builder.toString()}</form>`;
+    return new Tag('form', asAttributes({ action, method, ...attributes }), builder.toString()).toString();
   }
 }
 
-export type { FormMethod, FormOptions, InputOptions, Template };
+export { Tag };
+export type { FormMethod, FormOptions, InputOptions, TagAttributes, Template };
