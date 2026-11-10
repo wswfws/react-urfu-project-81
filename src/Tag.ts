@@ -29,9 +29,7 @@ const escapeAttribute = (value: TagAttributeValue): string =>
 const renderAttributes = (attributes: TagAttributes): string =>
   Object.entries(attributes)
     .filter(([, value]) => value !== undefined && value !== null && value !== false)
-    .map(([name, value]) =>
-      value === true ? ` ${name}` : ` ${name}="${escapeAttribute(value)}"`,
-    )
+    .map(([name, value]) => (value === true ? ` ${name}` : ` ${name}="${escapeAttribute(value)}"`))
     .join('');
 
 class Tag {

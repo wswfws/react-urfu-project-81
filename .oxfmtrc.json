@@ -1,0 +1,16 @@
+{
+  "singleQuote": true,
+  "printWidth": 100,
+  "ignorePatterns": [
+    "node_modules/",
+    "coverage/",
+    "dist/",
+    "*.json",
+    "*.jsonc",
+    "*.md",
+    "*.yml",
+    "*.yaml",
+    "*.css",
+    "*.html"
+  ]
+}

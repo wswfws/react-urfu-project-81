@@ -16,7 +16,11 @@
   ],
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "lint": "oxlint && oxfmt --check",
+    "lint-fix": "oxfmt && oxlint --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test-coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -28,6 +32,10 @@
   },
   "homepage": "https://github.com/wswfws/react-urfu-project-81#readme",
   "devDependencies": {
-    "typescript": "^7.0.2"
+    "@vitest/coverage-v8": "^5.1.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   }
 }
