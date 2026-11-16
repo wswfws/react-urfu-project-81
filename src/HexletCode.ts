@@ -23,6 +23,8 @@ const escapeHtml = (value: unknown): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
+
 const asAttributes = (attributes: Record<string, unknown>): TagAttributes =>
   attributes as TagAttributes;
 
@@ -38,6 +40,8 @@ export class FormBuilder {
 
     const { as = 'input', ...attributes } = options;
     const value = this.template[name];
+
+    this.parts.push(new Tag('label', { for: name }, escapeHtml(capitalize(name))).toString());
 
     if (as === 'textarea') {
       this.parts.push(
