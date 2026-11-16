@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/wswfws/react-urfu-project-81#readme",
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.1.0",
     "oxfmt": "^0.78.0",
     "oxlint": "^1.93.0",

@@ -1,4 +1,5 @@
-import Tag, { type TagAttributes } from './Tag.js';
+import type { FormItem, FormModel } from './model.js';
+import { renderForm } from './render.js';
 
 type FormMethod = 'get' | 'post';
 
@@ -15,21 +16,8 @@ type InputOptions = {
   [key: string]: unknown;
 };
 
-const escapeHtml = (value: unknown): string =>
-  String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
-
-const asAttributes = (attributes: Record<string, unknown>): TagAttributes =>
-  attributes as TagAttributes;
-
 export class FormBuilder {
-  private readonly parts: string[] = [];
+  private items: readonly FormItem[] = [];
 
   constructor(private readonly template: Template) {}
 
@@ -39,37 +27,27 @@ export class FormBuilder {
     }
 
     const { as = 'input', ...attributes } = options;
-    const value = this.template[name];
 
-    this.parts.push(new Tag('label', { for: name }, escapeHtml(capitalize(name))).toString());
+    this.items = [
+      ...this.items,
+      {
+        type: as,
+        name,
+        value: this.template[name],
+        attributes: { ...attributes },
+      },
+    ];
 
-    if (as === 'textarea') {
-      this.parts.push(
-        new Tag(
-          'textarea',
-          asAttributes({ cols: 20, rows: 40, ...attributes, name }),
-          escapeHtml(value ?? ''),
-        ).toString(),
-      );
-      return this;
-    }
-
-    this.parts.push(
-      new Tag(
-        'input',
-        asAttributes({ name, type: 'text', value: value ?? '', ...attributes }),
-      ).toString(),
-    );
     return this;
   }
 
   submit(value = 'Save'): this {
-    this.parts.push(new Tag('input', { type: 'submit', value }).toString());
+    this.items = [...this.items, { type: 'submit', value }];
     return this;
   }
 
-  toString(): string {
-    return this.parts.join('');
+  getItems(): readonly FormItem[] {
+    return this.items;
   }
 }
 
@@ -84,11 +62,14 @@ export default class HexletCode {
 
     callback(builder);
 
-    return new Tag(
-      'form',
-      asAttributes({ action: url, method, ...attributes }),
-      builder.toString(),
-    ).toString();
+    const form: FormModel = {
+      url,
+      method,
+      attributes: { ...attributes },
+      items: builder.getItems(),
+    };
+
+    return renderForm(form);
   }
 }
 

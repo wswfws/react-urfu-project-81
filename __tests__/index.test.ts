@@ -1,9 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import HexletCode from '../src/index';
 
-describe('HexletCode.formFor', () => {
-  const template = { name: 'rob', job: 'hexlet', gender: 'm' };
+const template = { name: 'rob', job: 'hexlet', gender: 'm' };
 
+const fixture = (name: string): string =>
+  readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), 'utf8').trim();
+
+describe('HexletCode.formFor', () => {
   it('renders an empty form with default options', () => {
     expect(HexletCode.formFor(template, {}, () => {})).toBe(
       '<form action="#" method="post"></form>',
@@ -26,63 +30,38 @@ describe('HexletCode.formFor', () => {
     expect(form).toBe('<form action="/search" method="get" class="form"></form>');
   });
 
-  it('renders inputs and a textarea', () => {
+  it('renders labels, fields and the default submit button', () => {
     const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
       f.input('name');
       f.input('job', { as: 'textarea' });
+      f.submit();
     });
 
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="name">Name</label><input name="name" type="text" value="rob">' +
-        '<label for="job">Job</label><textarea cols="20" rows="40" name="job">hexlet</textarea>' +
-        '</form>',
-    );
+    expect(form).toBe(fixture('full-form.html'));
   });
 
-  it('renders labels and a customizable submit button', () => {
+  it('allows overriding the submit button text', () => {
     const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
       f.input('name');
       f.input('job', { as: 'textarea' });
       f.submit('Wow');
     });
 
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="name">Name</label><input name="name" type="text" value="rob">' +
-        '<label for="job">Job</label><textarea cols="20" rows="40" name="job">hexlet</textarea>' +
-        '<input type="submit" value="Wow">' +
-        '</form>',
-    );
+    expect(form).toBe(fixture('custom-submit.html'));
   });
 
-  it('passes custom attributes to an input', () => {
+  it('passes custom attributes to fields', () => {
     const form = HexletCode.formFor(template, {}, (f) => {
-      f.input('name', { class: 'user-input' });
-      f.input('job');
-    });
-
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="name">Name</label>' +
-        '<input name="name" type="text" value="rob" class="user-input">' +
-        '<label for="job">Job</label>' +
-        '<input name="job" type="text" value="hexlet">' +
-        '</form>',
-    );
-  });
-
-  it('allows overriding textarea rows and cols', () => {
-    const form = HexletCode.formFor(template, { url: '#' }, (f) => {
+      f.input('name', {
+        class: 'user-input',
+        required: true,
+        disabled: false,
+        placeholder: undefined,
+      });
       f.input('job', { as: 'textarea', rows: 50, cols: 50 });
     });
 
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="job">Job</label>' +
-        '<textarea cols="50" rows="50" name="job">hexlet</textarea>' +
-        '</form>',
-    );
+    expect(form).toBe(fixture('custom-attributes.html'));
   });
 
   it('throws when a field does not exist in the template', () => {
@@ -109,14 +88,6 @@ describe('HexletCode.formFor', () => {
         '<textarea cols="20" rows="40" name="job"></textarea>' +
         '</form>',
     );
-  });
-
-  it('uses default submit value', () => {
-    const form = HexletCode.formFor(template, {}, (f) => {
-      f.submit();
-    });
-
-    expect(form).toBe('<form action="#" method="post"><input type="submit" value="Save"></form>');
   });
 
   it('escapes template values', () => {
