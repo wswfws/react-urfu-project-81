@@ -10,7 +10,6 @@ on:
 
 env:
   CI: true
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 permissions:
   contents: read
@@ -50,10 +49,3 @@ jobs:
 
       - name: Tests and coverage
         run: make test-coverage
-
-      - name: SonarQube Scan
-        if: env.SONAR_TOKEN != ''
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io

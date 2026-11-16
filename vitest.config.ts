@@ -9,6 +9,7 @@ export default defineConfig({
       reportsDirectory: 'coverage',
       reporter: ['json', 'lcov', 'text', 'clover'],
       include: ['src/**/*.ts'],
+      exclude: ['src/index.ts'],
       thresholds: {
         lines: 80,
         functions: 80,

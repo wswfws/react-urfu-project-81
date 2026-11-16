@@ -32,10 +32,22 @@ describe('HexletCode.formFor', () => {
     );
   });
 
+  it('renders an empty form with default options', () => {
+    expect(HexletCode.formFor(template, {}, () => {})).toBe(
+      '<form action="#" method="post"></form>',
+    );
+  });
+
+  it('uses url as the form action', () => {
+    expect(HexletCode.formFor(template, { url: '/users' }, () => {})).toBe(
+      '<form action="/users" method="post"></form>',
+    );
+  });
+
   it('accepts custom form attributes', () => {
     const form = HexletCode.formFor(
       template,
-      { method: 'get', action: '/search', class: 'form' },
+      { method: 'get', url: '/search', class: 'form' },
       () => {},
     );
 
@@ -72,6 +84,19 @@ describe('HexletCode.formFor', () => {
       '<form action="#" method="post">' +
         '<label for="name">Name</label>' +
         '<input name="name" type="text" value="&lt;b&gt;&amp;&quot;">' +
+        '</form>',
+    );
+  });
+
+  it('renders an empty input for a missing value', () => {
+    const form = HexletCode.formFor(template, {}, (f) => {
+      f.input('missing');
+    });
+
+    expect(form).toBe(
+      '<form action="#" method="post">' +
+        '<label for="missing">Missing</label>' +
+        '<input name="missing" type="text" value="">' +
         '</form>',
     );
   });
