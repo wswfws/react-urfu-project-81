@@ -19,9 +19,8 @@ import HexletCode from '@hexlet/code';
 
 const template = { name: 'rob', job: 'hexlet', gender: 'm' };
 const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
-  f.input('name');
-  f.input('job', { as: 'textarea' });
-  f.submit('Wow');
+  f.input('name', { class: 'user-input' });
+  f.input('job', { as: 'textarea', rows: 50, cols: 50 });
 });
 
 console.log(form);
@@ -29,13 +28,13 @@ console.log(form);
 
 ```html
 <form action="#" method="post">
-  <label for="name">Name</label>
-  <input name="name" type="text" value="rob" />
-  <label for="job">Job</label>
-  <textarea cols="20" rows="40" name="job">hexlet</textarea>
-  <input type="submit" value="Wow" />
+  <input name="name" type="text" value="rob" class="user-input" />
+  <textarea cols="50" rows="50" name="job">hexlet</textarea>
 </form>
 ```
+
+Если поля нет в шаблоне, `input()` выбрасывает ошибку
+`Field '<name>' does not exist in the template.`
 
 ## Команды
 

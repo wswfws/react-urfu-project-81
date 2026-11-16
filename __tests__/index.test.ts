@@ -4,34 +4,6 @@ import HexletCode from '../src/index';
 describe('HexletCode.formFor', () => {
   const template = { name: 'rob', job: 'hexlet', gender: 'm' };
 
-  it('renders a full form', () => {
-    const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
-      f.input('name');
-      f.input('job', { as: 'textarea' });
-      f.submit('Wow');
-    });
-
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="name">Name</label><input name="name" type="text" value="rob">' +
-        '<label for="job">Job</label><textarea cols="20" rows="40" name="job">hexlet</textarea>' +
-        '<input type="submit" value="Wow">' +
-        '</form>',
-    );
-  });
-
-  it('uses default form options', () => {
-    const form = HexletCode.formFor(template, {}, (f) => {
-      f.input('name');
-    });
-
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="name">Name</label><input name="name" type="text" value="rob">' +
-        '</form>',
-    );
-  });
-
   it('renders an empty form with default options', () => {
     expect(HexletCode.formFor(template, {}, () => {})).toBe(
       '<form action="#" method="post"></form>',
@@ -54,15 +26,66 @@ describe('HexletCode.formFor', () => {
     expect(form).toBe('<form action="/search" method="get" class="form"></form>');
   });
 
-  it('passes custom attributes to an input', () => {
-    const form = HexletCode.formFor(template, {}, (f) => {
-      f.input('name', { class: 'user-input' });
+  it('renders inputs and a textarea', () => {
+    const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
+      f.input('name');
+      f.input('job', { as: 'textarea' });
     });
 
     expect(form).toBe(
       '<form action="#" method="post">' +
-        '<label for="name">Name</label>' +
-        '<input name="name" type="text" class="user-input" value="rob">' +
+        '<input name="name" type="text" value="rob">' +
+        '<textarea cols="20" rows="40" name="job">hexlet</textarea>' +
+        '</form>',
+    );
+  });
+
+  it('passes custom attributes to an input', () => {
+    const form = HexletCode.formFor(template, {}, (f) => {
+      f.input('name', { class: 'user-input' });
+      f.input('job');
+    });
+
+    expect(form).toBe(
+      '<form action="#" method="post">' +
+        '<input name="name" type="text" value="rob" class="user-input">' +
+        '<input name="job" type="text" value="hexlet">' +
+        '</form>',
+    );
+  });
+
+  it('allows overriding textarea rows and cols', () => {
+    const form = HexletCode.formFor(template, { url: '#' }, (f) => {
+      f.input('job', { as: 'textarea', rows: 50, cols: 50 });
+    });
+
+    expect(form).toBe(
+      '<form action="#" method="post">' +
+        '<textarea cols="50" rows="50" name="job">hexlet</textarea>' +
+        '</form>',
+    );
+  });
+
+  it('throws when a field does not exist in the template', () => {
+    expect(() =>
+      HexletCode.formFor(template, { url: '/users' }, (f) => {
+        f.input('name');
+        f.input('job', { as: 'textarea' });
+        f.input('age');
+      }),
+    ).toThrow("Field 'age' does not exist in the template.");
+  });
+
+  it('renders empty values for explicit undefined fields', () => {
+    const form = HexletCode.formFor({ name: undefined, job: undefined }, {}, (f) => {
+      f.input('name');
+      f.input('job', { as: 'textarea' });
+    });
+
+    expect(form).toBe(
+      '<form action="#" method="post">' +
+        '<input name="name" type="text" value="">' +
+        '<textarea cols="20" rows="40" name="job"></textarea>' +
         '</form>',
     );
   });
@@ -82,34 +105,7 @@ describe('HexletCode.formFor', () => {
 
     expect(form).toBe(
       '<form action="#" method="post">' +
-        '<label for="name">Name</label>' +
         '<input name="name" type="text" value="&lt;b&gt;&amp;&quot;">' +
-        '</form>',
-    );
-  });
-
-  it('renders an empty input for a missing value', () => {
-    const form = HexletCode.formFor(template, {}, (f) => {
-      f.input('missing');
-    });
-
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="missing">Missing</label>' +
-        '<input name="missing" type="text" value="">' +
-        '</form>',
-    );
-  });
-
-  it('renders an empty textarea for a missing value', () => {
-    const form = HexletCode.formFor(template, {}, (f) => {
-      f.input('missing', { as: 'textarea', cols: 5 });
-    });
-
-    expect(form).toBe(
-      '<form action="#" method="post">' +
-        '<label for="missing">Missing</label>' +
-        '<textarea cols="5" rows="40" name="missing"></textarea>' +
         '</form>',
     );
   });

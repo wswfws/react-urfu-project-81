@@ -23,8 +23,6 @@ const escapeHtml = (value: unknown): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
-const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
-
 const asAttributes = (attributes: Record<string, unknown>): TagAttributes =>
   attributes as TagAttributes;
 
@@ -34,10 +32,12 @@ export class FormBuilder {
   constructor(private readonly template: Template) {}
 
   input(name: string, options: InputOptions = {}): this {
+    if (!(name in this.template)) {
+      throw new Error(`Field '${name}' does not exist in the template.`);
+    }
+
     const { as = 'input', ...attributes } = options;
     const value = this.template[name];
-
-    this.parts.push(new Tag('label', { for: name }, escapeHtml(capitalize(name))).toString());
 
     if (as === 'textarea') {
       this.parts.push(
@@ -53,7 +53,7 @@ export class FormBuilder {
     this.parts.push(
       new Tag(
         'input',
-        asAttributes({ name, type: 'text', ...attributes, value: value ?? '' }),
+        asAttributes({ name, type: 'text', value: value ?? '', ...attributes }),
       ).toString(),
     );
     return this;
