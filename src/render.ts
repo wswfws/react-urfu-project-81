@@ -1,5 +1,5 @@
 import Tag, { type TagAttributes } from './Tag.js';
-import type { FormItem, FormModel } from './model.js';
+import type { FieldItem, FormItem, FormModel } from './model.js';
 
 const escapeHtml = (value: unknown): string =>
   String(value)
@@ -14,8 +14,12 @@ const capitalize = (value: string): string => value.charAt(0).toUpperCase() + va
 const asAttributes = (attributes: Record<string, unknown>): TagAttributes =>
   attributes as TagAttributes;
 
-const renderLabel = (name: string): string =>
-  new Tag('label', { for: name }, escapeHtml(capitalize(name))).toString();
+const renderLabel = (item: FieldItem): string =>
+  new Tag(
+    'label',
+    asAttributes({ for: item.name, ...item.labelHtml }),
+    escapeHtml(item.label ?? capitalize(item.name)),
+  ).toString();
 
 const renderItem = (item: FormItem): string => {
   if (item.type === 'submit') {
@@ -24,7 +28,7 @@ const renderItem = (item: FormItem): string => {
 
   if (item.type === 'textarea') {
     return (
-      renderLabel(item.name) +
+      renderLabel(item) +
       new Tag(
         'textarea',
         asAttributes({ cols: 20, rows: 40, ...item.attributes, name: item.name }),
@@ -34,7 +38,7 @@ const renderItem = (item: FormItem): string => {
   }
 
   return (
-    renderLabel(item.name) +
+    renderLabel(item) +
     new Tag(
       'input',
       asAttributes({ name: item.name, type: 'text', value: item.value ?? '', ...item.attributes }),
@@ -45,6 +49,6 @@ const renderItem = (item: FormItem): string => {
 export const renderForm = (model: FormModel): string =>
   new Tag(
     'form',
-    asAttributes({ action: model.url, method: model.method, ...model.attributes }),
+    asAttributes({ method: model.method, action: model.url, ...model.attributes }),
     model.items.map(renderItem).join(''),
   ).toString();

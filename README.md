@@ -28,7 +28,7 @@ console.log(form);
 ```
 
 ```html
-<form action="#" method="post">
+<form method="post" action="#">
   <label for="name">Name</label>
   <input name="name" type="text" value="rob" class="user-input" />
   <label for="job">Job</label>

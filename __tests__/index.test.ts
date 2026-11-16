@@ -10,13 +10,13 @@ const fixture = (name: string): string =>
 describe('HexletCode.formFor', () => {
   it('renders an empty form with default options', () => {
     expect(HexletCode.formFor(template, {}, () => {})).toBe(
-      '<form action="#" method="post"></form>',
+      '<form method="post" action="#"></form>',
     );
   });
 
   it('uses url as the form action', () => {
     expect(HexletCode.formFor(template, { url: '/users' }, () => {})).toBe(
-      '<form action="/users" method="post"></form>',
+      '<form method="post" action="/users"></form>',
     );
   });
 
@@ -27,7 +27,7 @@ describe('HexletCode.formFor', () => {
       () => {},
     );
 
-    expect(form).toBe('<form action="/search" method="get" class="form"></form>');
+    expect(form).toBe('<form method="get" action="/search" class="form"></form>');
   });
 
   it('renders labels, fields and the default submit button', () => {
@@ -64,6 +64,15 @@ describe('HexletCode.formFor', () => {
     expect(form).toBe(fixture('custom-attributes.html'));
   });
 
+  it('allows overriding label text and attributes', () => {
+    const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
+      f.input('name', { label: 'User', labelHtml: { class: 'form-label', id: 'name-label' } });
+      f.submit('Ok');
+    });
+
+    expect(form).toBe(fixture('label-attributes.html'));
+  });
+
   it('throws when a field does not exist in the template', () => {
     expect(() =>
       HexletCode.formFor(template, { url: '/users' }, (f) => {
@@ -81,7 +90,7 @@ describe('HexletCode.formFor', () => {
     });
 
     expect(form).toBe(
-      '<form action="#" method="post">' +
+      '<form method="post" action="#">' +
         '<label for="name">Name</label>' +
         '<input name="name" type="text" value="">' +
         '<label for="job">Job</label>' +
@@ -96,7 +105,7 @@ describe('HexletCode.formFor', () => {
     });
 
     expect(form).toBe(
-      '<form action="#" method="post">' +
+      '<form method="post" action="#">' +
         '<label for="name">Name</label>' +
         '<input name="name" type="text" value="&lt;b&gt;&amp;&quot;">' +
         '</form>',

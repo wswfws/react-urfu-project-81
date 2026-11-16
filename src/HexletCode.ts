@@ -13,6 +13,8 @@ type FormOptions = {
 
 type InputOptions = {
   as?: 'input' | 'textarea';
+  label?: string;
+  labelHtml?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
@@ -26,7 +28,7 @@ export class FormBuilder {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
 
-    const { as = 'input', ...attributes } = options;
+    const { as = 'input', label, labelHtml, ...attributes } = options;
 
     this.items = [
       ...this.items,
@@ -34,6 +36,8 @@ export class FormBuilder {
         type: as,
         name,
         value: this.template[name],
+        label,
+        labelHtml: labelHtml ? { ...labelHtml } : undefined,
         attributes: { ...attributes },
       },
     ];

@@ -1,9 +1,11 @@
 export type FieldType = 'input' | 'textarea';
 
-interface FieldItem {
+export interface FieldItem {
   readonly type: FieldType;
   readonly name: string;
   readonly value: unknown;
+  readonly label?: string;
+  readonly labelHtml?: Readonly<Record<string, unknown>>;
   readonly attributes: Readonly<Record<string, unknown>>;
 }
 
